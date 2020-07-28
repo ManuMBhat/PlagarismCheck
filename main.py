@@ -10,7 +10,7 @@ def main():
     else:
         if not (args.doc1 is None and args.doc2 is None):
             print("Ignoring mentioned doc and working on dir")
-        finalOutput = traverseDir(args.dir)
+        finalOutput = traverseDir(args.dir, args.threshold)
 
 if __name__ == "__main__":
     main()

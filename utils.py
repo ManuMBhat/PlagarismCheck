@@ -55,7 +55,7 @@ def parse():
     return parser.parse_args()
 
 
-def traverseDir(dirname):
+def traverseDir(dirname, threshold):
     docNames = [os.path.join(dirname,f) for f in os.listdir(dirname) if f[-4:] == ".txt"]
     print(docNames)
     docWords = [docToDict(f) for f in docNames]
@@ -64,7 +64,8 @@ def traverseDir(dirname):
         j = i + 1
         while j < len(docNames):
             result = dotProduct(docWords[i],docWords[j])
-            finalOutput.append([docNames[i],docNames[j],result])
+            if result >= threshold:
+                finalOutput.append([docNames[i],docNames[j],result])
             j += 1
     print(finalOutput)
     return finalOutput
