@@ -1,6 +1,10 @@
 import numpy as np
 import argparse
 import os
+import csv
+
+outputFile = "PlagarismText.csv"
+ 
 def docToDict(filename):
     words = {}
     with open(filename) as infile:
@@ -49,7 +53,7 @@ def parse():
     parser.add_argument("--dir", default=False)
     parser.add_argument("--doc1",default=None)
     parser.add_argument("--doc2",default=None)
-    parser.add_argument("--out_csv",default="PlagarismTest.csv")
+    parser.add_argument("--out_csv",default=outputFile)
     parser.add_argument("--threshold",default=0.0, type=float)
     
     return parser.parse_args()
@@ -59,16 +63,29 @@ def traverseDir(dirname, threshold):
     docNames = [os.path.join(dirname,f) for f in os.listdir(dirname) if f[-4:] == ".txt"]
     print(docNames)
     docWords = [docToDict(f) for f in docNames]
+    finalMatrix = np.eye(len(docNames), dtype=np.float32)
     finalOutput = list()
+    
     for i in range(len(docNames)):
         j = i + 1
         while j < len(docNames):
             result = dotProduct(docWords[i],docWords[j])
             if result >= threshold:
                 finalOutput.append([docNames[i],docNames[j],result])
+                finalMatrix[j, i] = result
             j += 1
     print(finalOutput)
+    toCSV(docNames, finalMatrix)
+
     return finalOutput
+
+def toCSV(docs, finalMatrix):
+    docs = [filename.split('/')[-1] for filename in docs]
+    with open(outputFile, 'w', newline='') as csvfile:
+        outputwriter = csv.writer(csvfile, delimiter=',')
+        outputwriter.writerow(['File'] + docs)
+        for i in range(len(docs)):
+            outputwriter.writerow([docs[i]] + list(finalMatrix[i, :])) 
 
 
 def twoDocs(filename1,filename2):
