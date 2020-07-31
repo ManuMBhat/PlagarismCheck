@@ -1,5 +1,5 @@
-from utils import *
-import pandas as pd
+from utils import parse, twoDocs, traverseDir
+
 def main():
     args = parse()
     if not args.dir:

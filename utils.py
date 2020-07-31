@@ -1,10 +1,11 @@
 import numpy as np
+import pandas as pd
 import argparse
 import os
 import csv
 
-outputFile = "PlagarismText.csv"
- 
+outputFile = "PlagarismText"
+
 def docToDict(filename):
     words = {}
     with open(filename) as infile:
@@ -17,7 +18,6 @@ def docToDict(filename):
                 else:
                     words[word] = 1
     return words
-
 
 
 def dotProduct(words1, words2):
@@ -46,7 +46,6 @@ def dotProduct(words1, words2):
     return dot_product/(word1_norm * word2_norm)
 
 
-
 def parse():
     parser = argparse.ArgumentParser()
     #flag for directory
@@ -63,7 +62,10 @@ def traverseDir(dirname, threshold):
     docNames = [os.path.join(dirname,f) for f in os.listdir(dirname) if f[-4:] == ".txt"]
     print(docNames)
     docWords = [docToDict(f) for f in docNames]
-    finalMatrix = np.eye(len(docNames), dtype=np.float32)
+    
+    finalMatrix = np.empty((len(docNames), len(docNames)))
+    finalMatrix[:] = np.nan
+    
     finalOutput = list()
     
     for i in range(len(docNames)):
@@ -75,17 +77,27 @@ def traverseDir(dirname, threshold):
                 finalMatrix[j, i] = result
             j += 1
     print(finalOutput)
-    toCSV(docNames, finalMatrix)
+
+    toXLSX(docNames, finalMatrix, threshold)
 
     return finalOutput
 
+def toXLSX(docs, finalMatrix, threshold):
+    docs = [filename.split('/')[-1] for filename in docs]
+    plagarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
+    
+    highlight_plagarised = lambda val : 'background-color: red' if val > threshold else ''
+    plagarismDf = plagarismDf.style.applymap(highlight_plagarised)
+    plagarismDf.to_excel(outputFile + '.xlsx', engine='openpyxl')
+
+
 def toCSV(docs, finalMatrix):
     docs = [filename.split('/')[-1] for filename in docs]
-    with open(outputFile, 'w', newline='') as csvfile:
+    with open(outputFile + '.csv', 'w', newline='') as csvfile:
         outputwriter = csv.writer(csvfile, delimiter=',')
         outputwriter.writerow(['File'] + docs)
         for i in range(len(docs)):
-            outputwriter.writerow([docs[i]] + list(finalMatrix[i, :])) 
+            outputwriter.writerow([docs[i]] + list(finalMatrix[i, :]))
 
 
 def twoDocs(filename1,filename2):
@@ -93,6 +105,3 @@ def twoDocs(filename1,filename2):
     words2 = docToDict(filename2)
 
     return dotProduct(words1,words2)
-
-
-
