@@ -72,8 +72,7 @@ def traverseDir(dirname, threshold):
         j = i + 1
         while j < len(docNames):
             result = dotProduct(docWords[i],docWords[j])
-            if result >= threshold:
-                finalOutput.append([docNames[i],docNames[j],result])
+            finalOutput.append([docNames[i],docNames[j],result])
             finalMatrix[j, i] = result
             j += 1
     print(finalOutput)
