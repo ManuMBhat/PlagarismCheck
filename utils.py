@@ -74,21 +74,38 @@ def traverseDir(dirname, threshold):
             result = dotProduct(docWords[i],docWords[j])
             if result >= threshold:
                 finalOutput.append([docNames[i],docNames[j],result])
-                finalMatrix[j, i] = result
+            finalMatrix[j, i] = result
             j += 1
     print(finalOutput)
 
-    toXLSX(docNames, finalMatrix, threshold)
+    #toCSV(docs, finalMatrix)
+    #toXLSX(docNames, finalMatrix, threshold)
+    toHTML(docNames, finalMatrix, threshold)
 
     return finalOutput
 
 def toXLSX(docs, finalMatrix, threshold):
+    '''Highlights plagarised document pairs and exports as .xlsx'''
+
     docs = [filename.split('/')[-1] for filename in docs]
     plagarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
     
     highlight_plagarised = lambda val : 'background-color: red' if val > threshold else ''
-    plagarismDf = plagarismDf.style.applymap(highlight_plagarised)
-    plagarismDf.to_excel(outputFile + '.xlsx', engine='openpyxl')
+    styledPlagarismDf = plagarismDf.style.applymap(highlight_plagarised)
+    styledPlagarismDf.to_excel(outputFile + '.xlsx', engine='openpyxl')
+
+
+def toHTML(docs, finalMatrix, threshold):
+    '''Highlights plagarised document pairs in percentage and exports as .html'''
+    
+    docs = [filename.split('/')[-1] for filename in docs]
+    plagarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
+    
+    highlight_plagarised = lambda val : 'background-color: red' if val > threshold else ''
+    styledPlagarismDf = plagarismDf.style.applymap(highlight_plagarised).format("{:.1%}", na_rep="-")
+
+    with open(outputFile + ".html", "w") as htmlfile:
+        htmlfile.write(styledPlagarismDf.highlight_null().render())
 
 
 def toCSV(docs, finalMatrix):
