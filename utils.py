@@ -99,12 +99,12 @@ def toHTML(docs, finalMatrix, threshold):
     
     docs = [filename.split('/')[-1] for filename in docs]
     plagarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
-    
+
     highlight_plagarised = lambda val : 'background-color: red' if val > threshold else ''
     styledPlagarismDf = plagarismDf.style.applymap(highlight_plagarised).format("{:.1%}", na_rep="-")
 
     with open(outputFile + ".html", "w") as htmlfile:
-        htmlfile.write(styledPlagarismDf.highlight_null().render())
+        htmlfile.write(styledPlagarismDf.render())
 
 
 def toCSV(docs, finalMatrix):
