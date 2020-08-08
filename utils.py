@@ -5,7 +5,7 @@ import argparse
 import os
 import csv
 
-outputFile = "Plagarised"
+outputFile = "Plagiarised"
 
 class DocumentPair:
 
@@ -101,27 +101,27 @@ def traverseDir(dirname, flags, threshold):
     return finalOutput
 
 def toXLSX(docs, finalMatrix, threshold):
-    '''Highlights plagarised document pairs and exports as .xlsx'''
+    '''Highlights plagiarised document pairs and exports as .xlsx'''
 
     docs = [filename.split('/')[-1] for filename in docs]
-    plagarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
+    plagiarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
     
-    highlight_plagarised = lambda val : 'background-color: red' if val > threshold else ''
-    styledPlagarismDf = plagarismDf.style.applymap(highlight_plagarised)
-    styledPlagarismDf.to_excel(outputFile + '.xlsx', engine='openpyxl')
+    highlight_plagiarised = lambda val : 'background-color: red' if val > threshold else ''
+    styledPlagiarismDf = plagiarismDf.style.applymap(highlight_plagiarised)
+    styledPlagiarismDf.to_excel(outputFile + '.xlsx', engine='openpyxl')
 
 
 def toHTML(docs, finalMatrix, threshold):
-    '''Highlights plagarised document pairs in percentage and exports as .html'''
+    '''Highlights plagiarised document pairs in percentage and exports as .html'''
     
     docs = [filename.split('/')[-1] for filename in docs]
-    plagarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
+    plagiarismDf = pd.DataFrame(data=finalMatrix, index=docs, columns=docs)
 
-    highlight_plagarised = lambda val : 'background-color: red' if val > threshold else ''
-    styledPlagarismDf = plagarismDf.style.applymap(highlight_plagarised).format("{:.1%}", na_rep="-")
+    highlight_plagiarised = lambda val : 'background-color: red' if val > threshold else ''
+    styledPlagiarismDf = plagiarismDf.style.applymap(highlight_plagiarised).format("{:.1%}", na_rep="-")
 
     with open(outputFile + ".html", "w") as htmlfile:
-        htmlfile.write(styledPlagarismDf.render())
+        htmlfile.write(styledPlagiarismDf.render())
 
 
 def toCSV(docs, finalMatrix):
